@@ -1,3 +1,10 @@
 export { NexusClient } from "./client.js";
 export type { NexusClientOptions, NexusNetwork } from "./client.js";
 export { NexusApiError } from "./errors.js";
+export * from "./types.js";
+export * from "./endpoints/addresses.js";
+export * from "./endpoints/account.js";
+export * from "./endpoints/assets.js";
+export * from "./endpoints/transactions.js";
+export * from "./endpoints/epoch.js";
+export * from "./endpoints/scripts.js";
