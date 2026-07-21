@@ -1,11 +1,11 @@
 {
   "name": "@adlabs/nexus",
   "version": "0.1.0",
-  "description": "TypeScript SDK for the Nexus Cardano API \u2014 typed client + lucid-evolution provider",
+  "description": "TypeScript SDK for the Nexus Cardano API — typed client + lucid-evolution provider",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Gero-Labs/nexus-sdk.git"
+    "url": "git+https://github.com/Gero-Labs/nexus-sdk.git"
   },
   "publishConfig": {
     "access": "public"
@@ -19,12 +19,24 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./lucid": {
-      "import": { "types": "./dist/lucid/index.d.ts", "default": "./dist/lucid/index.js" },
-      "require": { "types": "./dist/lucid/index.d.cts", "default": "./dist/lucid/index.cjs" }
+      "import": {
+        "types": "./dist/lucid/index.d.ts",
+        "default": "./dist/lucid/index.js"
+      },
+      "require": {
+        "types": "./dist/lucid/index.d.cts",
+        "default": "./dist/lucid/index.cjs"
+      }
     }
   },
   "files": [
