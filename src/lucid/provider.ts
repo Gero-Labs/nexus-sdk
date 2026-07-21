@@ -138,7 +138,8 @@ export class NexusProvider implements Provider {
 
   async awaitTx(txHash: TxHash, checkInterval = 3000): Promise<boolean> {
     for (;;) {
-      const tx = await getTransaction(this.client, txHash).catch(() => null);
+      // getTransaction maps 404 -> null; any other error (auth, 5xx, network) must propagate.
+      const tx = await getTransaction(this.client, txHash);
       if (tx !== null) return true;
       await new Promise((resolve) => setTimeout(resolve, checkInterval));
     }

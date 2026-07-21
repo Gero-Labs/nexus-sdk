@@ -69,6 +69,13 @@ describe("NexusProvider", () => {
     expect(found).toBe(true);
   });
 
+  it("awaitTx rejects on non-404 errors instead of polling forever", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      jsonResponse({ error: "Invalid API key" }, 401),
+    );
+    await expect(provider.awaitTx("a".repeat(64), 10)).rejects.toMatchObject({ status: 401 });
+  });
+
   it("submitTx posts hex and returns hash", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("ff".repeat(32)));
     expect(await provider.submitTx("84a400")).toBe("ff".repeat(32));
