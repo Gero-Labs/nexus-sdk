@@ -76,10 +76,27 @@ function costModelToArray(model: Record<string, number>): number[] {
     .map((key) => model[key]!);
 }
 
+const COST_MODEL_KEY_PATTERN = /plutus[:_\s-]?v?(1|2|3)/i;
+
+/** Normalize a Nexus cost-model key (`plutusV1`, `PLUTUS_V2`, `plutus:v3`, ...) to the
+ * canonical lucid key, or `undefined` if it doesn't match a known Plutus version. */
+function normalizeCostModelKey(key: string): "PlutusV1" | "PlutusV2" | "PlutusV3" | undefined {
+  const match = COST_MODEL_KEY_PATTERN.exec(key);
+  if (!match) return undefined;
+  return `PlutusV${match[1]}` as "PlutusV1" | "PlutusV2" | "PlutusV3";
+}
+
 export function toLucidProtocolParameters(dto: NexusProtocolParams): ProtocolParameters {
   const costModels: Record<string, number[]> = {};
   for (const [version, model] of Object.entries(dto.costModels ?? {})) {
-    costModels[version] = costModelToArray(model);
+    const normalized = normalizeCostModelKey(version);
+    if (!normalized) continue;
+    costModels[normalized] = costModelToArray(model);
+  }
+  const requiredVersions = ["PlutusV1", "PlutusV2", "PlutusV3"] as const;
+  const missing = requiredVersions.filter((version) => !(version in costModels));
+  if (missing.length > 0) {
+    throw new Error(`Nexus protocol params missing cost model(s): ${missing.join(", ")}`);
   }
   return {
     protocolMajorVersion: dto.protocolMajorVer,

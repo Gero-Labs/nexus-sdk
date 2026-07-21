@@ -99,6 +99,54 @@ describe("toLucidProtocolParameters", () => {
     expect(params.collateralPercentage).toBe(150);
     expect(params.costModels.PlutusV1).toEqual([100, 200]);
   });
+
+  it("normalizes mixed-spelling cost model keys to canonical PlutusVN keys", () => {
+    const dto: NexusProtocolParams = {
+      minFeeA: 44,
+      minFeeB: 155381,
+      maxTxSize: 16384,
+      maxValSize: "5000",
+      keyDeposit: "2000000",
+      poolDeposit: "500000000",
+      priceMem: 0.0577,
+      priceStep: 0.0000721,
+      maxTxExMem: "14000000",
+      maxTxExSteps: "10000000000",
+      coinsPerUtxoSize: "4310",
+      collateralPercent: 150,
+      maxCollateralInputs: 3,
+      costModels: {
+        plutus_v1: { "0": 100, "1": 200 },
+        PlutusV2: { "0": 1 },
+        "plutus:v3": { "0": 2 },
+      },
+    };
+    const params = toLucidProtocolParameters(dto);
+    expect(Object.keys(params.costModels).sort()).toEqual(["PlutusV1", "PlutusV2", "PlutusV3"]);
+    expect(params.costModels.PlutusV1).toEqual([100, 200]);
+    expect(params.costModels.PlutusV2).toEqual([1]);
+    expect(params.costModels.PlutusV3).toEqual([2]);
+  });
+
+  it("throws when a required cost model is missing", () => {
+    const dto: NexusProtocolParams = {
+      minFeeA: 44,
+      minFeeB: 155381,
+      maxTxSize: 16384,
+      maxValSize: "5000",
+      keyDeposit: "2000000",
+      poolDeposit: "500000000",
+      priceMem: 0.0577,
+      priceStep: 0.0000721,
+      maxTxExMem: "14000000",
+      maxTxExSteps: "10000000000",
+      coinsPerUtxoSize: "4310",
+      collateralPercent: 150,
+      maxCollateralInputs: 3,
+      costModels: { PlutusV1: { "0": 100 }, PlutusV2: { "0": 1 } },
+    };
+    expect(() => toLucidProtocolParameters(dto)).toThrow(/missing cost model/i);
+  });
 });
 
 describe("toLucidDelegation", () => {

@@ -18,7 +18,7 @@ describe("NexusClient", () => {
     const fetchSpy = vi
       .spyOn(globalThis, "fetch")
       .mockResolvedValue(jsonResponse([{ ok: true }]));
-    const client = new NexusClient({ apiKey: "k1", network: "PREPROD" });
+    const client = new NexusClient({ apiKey: "k1", network: "CARDANO_PREPROD" });
 
     const out = await client.get<{ ok: boolean }[]>("/api/addresses/addr1/utxos", {
       page: 1,
@@ -27,7 +27,7 @@ describe("NexusClient", () => {
     expect(out).toEqual([{ ok: true }]);
     const [url, init] = fetchSpy.mock.calls[0]!;
     expect(String(url)).toBe(
-      "https://nexus.gerowallet.io/api/addresses/addr1/utxos?page=1&network=PREPROD",
+      "https://nexus.gerowallet.io/api/addresses/addr1/utxos?page=1&network=CARDANO_PREPROD",
     );
     expect(new Headers(init!.headers).get("X-Api-Key")).toBe("k1");
   });

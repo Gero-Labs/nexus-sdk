@@ -1,6 +1,6 @@
 import { NexusApiError } from "./errors.js";
 
-export type NexusNetwork = "MAINNET" | "PREPROD" | "PREVIEW";
+export type NexusNetwork = "CARDANO_MAINNET" | "CARDANO_PREPROD" | "CARDANO_PREVIEW";
 
 export interface NexusClientOptions {
   apiKey: string;
@@ -26,7 +26,8 @@ async function errorFromResponse(res: Response): Promise<NexusApiError> {
       body !== null &&
       typeof body === "object" &&
       "error" in body &&
-      typeof (body as { error: unknown }).error === "string"
+      typeof (body as { error: unknown }).error === "string" &&
+      (body as { error: string }).error.length > 0
     ) {
       message = (body as { error: string }).error;
     }
@@ -63,7 +64,6 @@ export class NexusClient {
 
   private async request(url: string, init: RequestInit, retry: boolean): Promise<Response> {
     const attempts = retry ? this.retryDelaysMs.length + 1 : 1;
-    let lastError: unknown;
     for (let attempt = 0; attempt < attempts; attempt++) {
       if (attempt > 0) await sleep(this.retryDelaysMs[attempt - 1] ?? 0);
       try {
@@ -73,19 +73,14 @@ export class NexusClient {
           signal: AbortSignal.timeout(this.timeoutMs),
         });
         if (res.ok) return res;
-        if (res.status >= 500 && attempt < attempts - 1) {
-          lastError = await errorFromResponse(res);
-          continue;
-        }
+        if (res.status >= 500 && attempt < attempts - 1) continue;
         throw await errorFromResponse(res);
       } catch (error) {
         if (error instanceof NexusApiError) throw error;
-        // Network / timeout error.
-        lastError = error;
+        // Network / timeout error: retry unless this was the last attempt.
         if (attempt >= attempts - 1) break;
       }
     }
-    if (lastError instanceof NexusApiError) throw lastError;
     throw new NexusApiError(0, "Nexus request failed: network error or timeout");
   }
 

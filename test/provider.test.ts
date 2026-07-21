@@ -23,7 +23,7 @@ describe("NexusProvider", () => {
   it("maps lucid network to Nexus network param", async () => {
     const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(jsonResponse([]));
     await provider.getUtxos("addr_test1qz");
-    expect(String(spy.mock.calls[0]![0])).toContain("network=PREPROD");
+    expect(String(spy.mock.calls[0]![0])).toContain("network=CARDANO_PREPROD");
   });
 
   it("getUtxos paginates until a short page", async () => {
@@ -36,6 +36,16 @@ describe("NexusProvider", () => {
     expect(utxos).toHaveLength(101);
     expect(spy).toHaveBeenCalledTimes(2);
     expect(String(spy.mock.calls[1]![0])).toContain("page=2");
+  });
+
+  it("getUtxos stops after a batch that isn't exactly pageSize, even if larger", async () => {
+    // A misbehaving/self-hosted server that ignores pageSize and returns MORE than
+    // PAGE_SIZE items must not cause an infinite loop or duplicate accumulation.
+    const oversizedPage = Array.from({ length: 150 }, (_, i) => utxoDto(i));
+    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(jsonResponse(oversizedPage));
+    const utxos = await provider.getUtxos("addr_test1qz");
+    expect(utxos).toHaveLength(150);
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 
   it("getUtxos accepts a Credential and uses the cred endpoint", async () => {

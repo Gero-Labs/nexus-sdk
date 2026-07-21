@@ -10,6 +10,10 @@ provider.
 npm install @adlabs/nexus @lucid-evolution/lucid
 ```
 
+> **Note:** the `/lucid` adapter's type dependency (`@lucid-evolution/core-types`)
+> transitively installs the Cardano multiplatform WASM libraries (~9MB). The core
+> client (`@adlabs/nexus`) itself has zero runtime dependencies.
+
 ## Use with lucid-evolution
 
 ```typescript
@@ -27,7 +31,7 @@ const lucid = await Lucid(
 ```typescript
 import { NexusClient, getAddressUtxos } from "@adlabs/nexus";
 
-const client = new NexusClient({ apiKey: process.env.NEXUS_API_KEY!, network: "PREPROD" });
+const client = new NexusClient({ apiKey: process.env.NEXUS_API_KEY!, network: "CARDANO_PREPROD" });
 const utxos = await getAddressUtxos(client, "addr_test1...", 1, 100);
 ```
 
@@ -36,7 +40,7 @@ const utxos = await getAddressUtxos(client, "addr_test1...", 1, 100);
 | Option | Default | Notes |
 |---|---|---|
 | `apiKey` | — | Nexus API key (`X-Api-Key`) |
-| `network` | key's scoped network | `Mainnet` / `Preprod` / `Preview` (provider) or `MAINNET`… (client) |
+| `network` | key's scoped network | `Mainnet` / `Preprod` / `Preview` (provider) or `CARDANO_MAINNET` / `CARDANO_PREPROD` / `CARDANO_PREVIEW` (client) |
 | `baseUrl` | `https://nexus.gerowallet.io` | self-hosted Nexus deployments |
 | `timeoutMs` | `30000` | per-request timeout |
 

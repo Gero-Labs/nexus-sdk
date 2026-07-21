@@ -1,10 +1,10 @@
-// Usage: NEXUS_API_KEY=... [NEXUS_BASE_URL=...] [NEXUS_NETWORK=PREPROD] \
+// Usage: NEXUS_API_KEY=... [NEXUS_BASE_URL=...] [NEXUS_NETWORK=CARDANO_PREPROD] \
 //        node scripts/capture-fixtures.mjs addr_test1... stake_test1...
 import { mkdir, writeFile } from "node:fs/promises";
 
 const API_KEY = process.env.NEXUS_API_KEY;
 const BASE_URL = process.env.NEXUS_BASE_URL ?? "https://nexus.gerowallet.io";
-const NETWORK = process.env.NEXUS_NETWORK ?? "PREPROD";
+const NETWORK = process.env.NEXUS_NETWORK ?? "CARDANO_PREPROD";
 if (!API_KEY) throw new Error("NEXUS_API_KEY env var required");
 
 const [address, stakeAddress] = process.argv.slice(2);

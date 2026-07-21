@@ -59,7 +59,7 @@ nexus-sdk/
 
 - Constructor: `{ apiKey, baseUrl?, network?, timeoutMs? }`.
   - `baseUrl` defaults to `https://nexus.gerowallet.io`.
-  - `network` (e.g. `MAINNET`, `PREPROD`) sent as `?network=` on every request —
+  - `network` (e.g. `CARDANO_MAINNET`, `CARDANO_PREPROD`) sent as `?network=` on every request —
     matches Nexus `NetworkResolver` (falls back to the API key's scoped network when omitted).
 - Auth: `X-Api-Key` header.
 - Errors: non-2xx → `NexusApiError { status, code?, message }`. Message comes from the
@@ -86,7 +86,8 @@ Implements the `Provider` interface from `@lucid-evolution/core-types`:
 
 Constructor: `new NexusProvider({ apiKey, network, baseUrl? })` — thin wrapper that owns a
 `NexusClient` and the mappers. Network string accepts lucid-style names
-(`"Mainnet" | "Preprod" | "Preview"`) and maps to Nexus enum values.
+(`"Mainnet" | "Preprod" | "Preview"`) and maps to Nexus enum values
+(`CARDANO_MAINNET` / `CARDANO_PREPROD` / `CARDANO_PREVIEW`).
 
 ### Mappers
 

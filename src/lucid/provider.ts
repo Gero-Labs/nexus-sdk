@@ -50,9 +50,9 @@ export interface NexusProviderOptions {
 }
 
 const NETWORK_MAP: Record<LucidNetwork, NexusNetwork> = {
-  Mainnet: "MAINNET",
-  Preprod: "PREPROD",
-  Preview: "PREVIEW",
+  Mainnet: "CARDANO_MAINNET",
+  Preprod: "CARDANO_PREPROD",
+  Preview: "CARDANO_PREVIEW",
 };
 
 const PAGE_SIZE = 100;
@@ -76,7 +76,9 @@ export class NexusProvider implements Provider {
     for (let page = 1; ; page++) {
       const batch = await fetchPage(page);
       all.push(...batch);
-      if (batch.length < PAGE_SIZE) break;
+      // A batch that isn't exactly pageSize means either the last page, or a server
+      // ignoring pagination entirely — stop either way to avoid an infinite loop.
+      if (batch.length !== PAGE_SIZE) break;
     }
     return all.map(toLucidUtxoFromAddressUtxo);
   }
