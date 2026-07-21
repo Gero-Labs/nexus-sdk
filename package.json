@@ -1,0 +1,36 @@
+{
+  "name": "@adlabs/nexus",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for the Nexus Cardano API — typed client + lucid-evolution provider",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/Gero-Labs/nexus-sdk.git" },
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js", "require": "./dist/index.cjs" },
+    "./lucid": { "types": "./dist/lucid/index.d.ts", "import": "./dist/lucid/index.js", "require": "./dist/lucid/index.cjs" }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lucid-evolution/core-types": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "eslint": "^8.57.0",
+    "typescript-eslint": "^7.4.0",
+    "tsup": "^7.3.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}
