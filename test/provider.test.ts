@@ -76,6 +76,16 @@ describe("NexusProvider", () => {
     expect(String(spy.mock.calls[0]![0])).toContain("pageSize=100");
   });
 
+  it("getDelegation returns undelegated defaults on 404", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      jsonResponse({ error: "not found" }, 404),
+    );
+    expect(await provider.getDelegation("stake_test1uq")).toEqual({
+      poolId: null,
+      rewards: 0n,
+    });
+  });
+
   it("getDatum returns datum cbor", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       jsonResponse({ hash: "c".repeat(64), cbor: "d87980" }),

@@ -22,4 +22,4 @@ async function capture(name, path) {
 await mkdir("test/fixtures", { recursive: true });
 await capture("address-utxos", `/api/addresses/${address}/utxos`);
 await capture("account-info", `/api/account/${stakeAddress}/info`);
-await capture("protocol-params", "/api/epoch/params");
+await capture("protocol-params", "/api/epoch/latest/parameters");

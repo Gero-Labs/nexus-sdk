@@ -73,7 +73,7 @@ Implements the `Provider` interface from `@lucid-evolution/core-types`:
 
 | Provider method | Nexus endpoint | Notes |
 |---|---|---|
-| `getProtocolParameters()` | `GET /api/epoch/params` | map to lucid `ProtocolParameters` incl. cost models |
+| `getProtocolParameters()` | `GET /api/epoch/latest/parameters` | map to lucid `ProtocolParameters` incl. cost models |
 | `getUtxos(addressOrCredential)` | `GET /api/addresses/{address}/utxos` / `GET /api/addresses/cred/{credential}/utxos` | paginated (`page`/`pageSize`, max 100) — loop until short page |
 | `getUtxosWithUnit(addrOrCred, unit)` | `GET /api/addresses/{address}/utxos/{asset}` | |
 | `getUtxoByUnit(unit)` | `GET /api/assets/{unit}/utxos` | throw if 0 or >1 holders (lucid contract) |

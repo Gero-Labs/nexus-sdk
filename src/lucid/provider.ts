@@ -15,6 +15,7 @@ import type {
   UTxO,
 } from "@lucid-evolution/core-types";
 import { NexusClient, type NexusNetwork } from "../client.js";
+import { NexusApiError } from "../errors.js";
 import { getAccountInfo } from "../endpoints/account.js";
 import {
   getAddressUtxos,
@@ -132,7 +133,15 @@ export class NexusProvider implements Provider {
   }
 
   async getDelegation(rewardAddress: RewardAddress): Promise<Delegation> {
-    return toLucidDelegation(await getAccountInfo(this.client, rewardAddress));
+    try {
+      return toLucidDelegation(await getAccountInfo(this.client, rewardAddress));
+    } catch (error) {
+      // Unregistered stake accounts 404; lucid's providers report them as undelegated.
+      if (error instanceof NexusApiError && error.status === 404) {
+        return { poolId: null, rewards: 0n };
+      }
+      throw error;
+    }
   }
 
   async getDatum(datumHash: DatumHash): Promise<Datum> {

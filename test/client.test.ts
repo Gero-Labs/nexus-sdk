@@ -37,9 +37,9 @@ describe("NexusClient", () => {
       .spyOn(globalThis, "fetch")
       .mockResolvedValue(jsonResponse({}));
     const client = new NexusClient({ apiKey: "k1" });
-    await client.get("/api/epoch/params");
+    await client.get("/api/epoch/latest/parameters");
     expect(String(fetchSpy.mock.calls[0]![0])).toBe(
-      "https://nexus.gerowallet.io/api/epoch/params",
+      "https://nexus.gerowallet.io/api/epoch/latest/parameters",
     );
   });
 
@@ -75,7 +75,7 @@ describe("NexusClient", () => {
       .mockResolvedValueOnce(jsonResponse({ error: "boom" }, 502))
       .mockResolvedValueOnce(jsonResponse({ fine: true }));
     const client = new NexusClient({ apiKey: "k1", retryDelaysMs: [0, 0] });
-    const out = await client.get<{ fine: boolean }>("/api/epoch/params");
+    const out = await client.get<{ fine: boolean }>("/api/epoch/latest/parameters");
     expect(out).toEqual({ fine: true });
     expect(fetchSpy).toHaveBeenCalledTimes(3);
   });

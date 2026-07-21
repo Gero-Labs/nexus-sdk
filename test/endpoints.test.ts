@@ -69,7 +69,7 @@ describe("endpoints", () => {
     await getScript(client, "5".repeat(56));
     const urls = spy.mock.calls.map((call) => String(call[0]));
     expect(urls[0]).toContain("/api/account/stake1uxyz/info");
-    expect(urls[1]).toContain("/api/epoch/params");
+    expect(urls[1]).toContain("/api/epoch/latest/parameters");
     expect(urls[2]).toContain(`/api/scripts/datum/${"d".repeat(64)}`);
     expect(urls[3]).toContain(`/api/scripts/${"5".repeat(56)}`);
   });
