@@ -41,7 +41,7 @@ nexus-sdk/
       assets.ts      # asset utxo locations
       transactions.ts# by-hash, submit, evaluate, utxos-by-outref
       epoch.ts       # protocol parameters
-      scripts.ts     # script by hash
+      scripts.ts     # script by hash, datum by hash
     lucid/
       provider.ts    # NexusProvider implements Provider (from @lucid-evolution/core-types)
       mappers.ts     # Nexus DTOs → lucid UTxO / ProtocolParameters / Delegation / EvalRedeemer
@@ -79,7 +79,7 @@ Implements the `Provider` interface from `@lucid-evolution/core-types`:
 | `getUtxoByUnit(unit)` | `GET /api/assets/{unit}/utxos` | throw if 0 or >1 holders (lucid contract) |
 | `getUtxosByOutRef(outRefs)` | `POST /api/transactions/utxos` | ≤100 per call — chunk larger inputs |
 | `getDelegation(rewardAddress)` | `GET /api/account/{stakeAddress}/info` | `{ poolId, rewards }` |
-| `getDatum(datumHash)` | `GET /api/addresses/datum/{datumHash}` | returns datum CBOR |
+| `getDatum(datumHash)` | `GET /api/scripts/datum/{datumHash}` | returns datum CBOR |
 | `awaitTx(txHash, checkInterval?)` | poll `GET /api/transactions/{txHash}` | default interval 3s, cap total wait |
 | `submitTx(tx)` | `POST /api/transactions/submit` | CBOR hex body; surface node error message |
 | `evaluateTx(tx, additionalUTxOs?)` | `POST /api/transactions/evaluate` | map to `EvalRedeemer[]` |
