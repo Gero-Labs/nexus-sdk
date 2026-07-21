@@ -50,23 +50,23 @@ export function toLucidUtxoFromAddressUtxo(dto: NexusAddressUtxo): UTxO {
 
 export function toLucidUtxoFromOutRefUtxo(dto: NexusOutRefUtxo): UTxO {
   const assets: Assets = { lovelace: 0n };
-  for (const amount of dto.amount ?? []) {
+  for (const amount of dto.amounts ?? []) {
     if (amount.unit === "lovelace") assets.lovelace = BigInt(amount.quantity);
     else assets[amount.unit] = BigInt(amount.quantity);
   }
-  if (assets.lovelace === 0n && dto.lovelaceAmount != null) {
-    assets.lovelace = BigInt(dto.lovelaceAmount);
+  if (assets.lovelace === 0n && dto.lovelace_amount != null) {
+    assets.lovelace = BigInt(dto.lovelace_amount);
   }
-  const inlineDatum = dto.inlineDatum ?? null;
+  const inlineDatum = dto.inline_datum ?? null;
   return {
-    txHash: dto.txHash,
-    outputIndex: dto.outputIndex,
-    address: dto.address,
+    txHash: dto.tx_hash,
+    outputIndex: dto.output_index,
+    address: dto.owner_addr,
     assets,
-    datumHash: inlineDatum ? null : (dto.dataHash ?? null),
+    datumHash: inlineDatum ? null : (dto.data_hash ?? null),
     datum: inlineDatum,
     // UtxoDto carries no script type — PlutusV2 is the dominant on-chain case.
-    scriptRef: dto.scriptRef ? toLucidScript(undefined, dto.scriptRef) : null,
+    scriptRef: dto.script_ref ? toLucidScript(undefined, dto.script_ref) : null,
   };
 }
 

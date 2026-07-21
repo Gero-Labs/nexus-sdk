@@ -50,23 +50,38 @@ describe("toLucidUtxoFromAddressUtxo", () => {
 
 describe("toLucidUtxoFromOutRefUtxo", () => {
   it("maps the transaction-model UTxO shape", () => {
+    // Wire shape is snake_case (backend UtxoDto @JsonProperty), unlike address utxos.
     const dto: NexusOutRefUtxo = {
-      txHash: "e".repeat(64),
-      outputIndex: 0,
-      address: "addr_test1qq",
-      amount: [
+      tx_hash: "e".repeat(64),
+      output_index: 0,
+      owner_addr: "addr_test1qq",
+      amounts: [
         { unit: "lovelace", quantity: "1500000" },
         { unit: "f".repeat(56) + "41", quantity: "2" },
       ],
-      dataHash: "1".repeat(64),
-      inlineDatum: "d87980",
-      scriptRef: "490100",
+      data_hash: "1".repeat(64),
+      inline_datum: "d87980",
+      script_ref: "490100",
     };
     const utxo = toLucidUtxoFromOutRefUtxo(dto);
+    expect(utxo.txHash).toBe("e".repeat(64));
+    expect(utxo.outputIndex).toBe(0);
+    expect(utxo.address).toBe("addr_test1qq");
     expect(utxo.assets).toEqual({ lovelace: 1500000n, ["f".repeat(56) + "41"]: 2n });
     expect(utxo.datum).toBe("d87980");
     // scriptRef type is unknown in this DTO — mapper defaults to PlutusV2 CBOR wrapper.
     expect(utxo.scriptRef).toEqual({ type: "PlutusV2", script: "490100" });
+  });
+
+  it("falls back to lovelace_amount when amounts has no lovelace entry", () => {
+    const utxo = toLucidUtxoFromOutRefUtxo({
+      tx_hash: "e".repeat(64),
+      output_index: 1,
+      owner_addr: "addr_test1qq",
+      amounts: [],
+      lovelace_amount: 28581840,
+    });
+    expect(utxo.assets.lovelace).toBe(28581840n);
   });
 });
 

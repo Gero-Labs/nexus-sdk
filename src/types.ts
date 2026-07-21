@@ -51,22 +51,43 @@ export interface NexusAmount {
 }
 
 /** Shape of POST /api/transactions/utxos entries (different DTO from NexusAddressUtxo). */
+/**
+ * Shape of POST /api/transactions/utxos entries. Unlike the address-utxo
+ * endpoints, this DTO serializes snake_case on the wire (@JsonProperty in
+ * the backend's UtxoDto) — wire-verified against preprod.
+ */
+export interface NexusOutRefAmount {
+  unit: string;
+  quantity: string;
+  policy_id?: string | null;
+  asset_name?: string | null;
+}
+
 export interface NexusOutRefUtxo {
-  txHash: string;
-  outputIndex: number;
-  address: string;
-  amount?: NexusAmount[];
-  lovelaceAmount?: number;
-  dataHash?: string;
+  tx_hash: string;
+  output_index: number;
+  owner_addr: string;
+  owner_stake_addr?: string | null;
+  owner_payment_credential?: string | null;
+  owner_stake_credential?: string | null;
+  amounts?: NexusOutRefAmount[] | null;
+  lovelace_amount?: number | null;
+  data_hash?: string | null;
   /** Inline datum CBOR hex. */
-  inlineDatum?: string;
-  inlineDatumJson?: Record<string, unknown>;
-  referenceScriptHash?: string;
+  inline_datum?: string | null;
+  inline_datum_json?: Record<string, unknown> | null;
+  reference_script_hash?: string | null;
   /** Reference script CBOR hex. */
-  scriptRef?: string;
-  collateral?: boolean;
-  reference?: boolean;
-  consumedByTx?: string;
+  script_ref?: string | null;
+  collateral?: boolean | null;
+  reference?: boolean | null;
+  consumed_by_tx?: string | null;
+  is_collateral_return?: boolean | null;
+  block_number?: number | null;
+  block_time?: number | null;
+  block_hash?: string | null;
+  slot?: number | null;
+  epoch?: number | null;
 }
 
 export interface NexusOutRefRequest {

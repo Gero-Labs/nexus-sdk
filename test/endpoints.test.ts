@@ -49,7 +49,7 @@ describe("endpoints", () => {
   it("getUtxosByOutRefs chunks requests of >100 into batches", async () => {
     const spy = vi
       .spyOn(globalThis, "fetch")
-      .mockImplementation(() => Promise.resolve(jsonResponse([{ txHash: "aa", outputIndex: 0, address: "addr1" }])));
+      .mockImplementation(() => Promise.resolve(jsonResponse([{ tx_hash: "aa", output_index: 0, owner_addr: "addr1" }])));
     const refs = Array.from({ length: 150 }, (_, i) => ({
       txHash: "t".repeat(64),
       outputIndex: i,
