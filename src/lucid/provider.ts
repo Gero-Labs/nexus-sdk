@@ -111,7 +111,10 @@ export class NexusProvider implements Provider {
   }
 
   async getUtxoByUnit(unit: Unit): Promise<UTxO> {
-    const dtos = await getAssetUtxos(this.client, unit, 1, 2);
+    // The primary (YACI) backend already returns unspent-only UTxOs (SQL UNSPENT_PREDICATE),
+    // but fallback providers aren't guaranteed to honor that. The `spent !== true` filter plus
+    // this wide page size guard against a fallback provider returning spent entries mixed in.
+    const dtos = await getAssetUtxos(this.client, unit, 1, 100);
     const unspent = dtos.filter((dto) => dto.spent !== true);
     if (unspent.length === 0) throw new Error(`UTxO with unit ${unit} not found`);
     if (unspent.length > 1) throw new Error(`Unit ${unit} is held in more than one UTxO`);

@@ -54,6 +54,18 @@ describe("NexusProvider", () => {
     await expect(provider.getUtxoByUnit("b".repeat(56) + "41")).rejects.toThrow(/more than one/i);
   });
 
+  it("getUtxoByUnit requests a wide page and filters out spent entries", async () => {
+    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      jsonResponse([
+        { ...utxoDto(0), spent: true },
+        utxoDto(1),
+      ]),
+    );
+    const utxo = await provider.getUtxoByUnit("b".repeat(56) + "41");
+    expect(utxo.outputIndex).toBe(1);
+    expect(String(spy.mock.calls[0]![0])).toContain("pageSize=100");
+  });
+
   it("getDatum returns datum cbor", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       jsonResponse({ hash: "c".repeat(64), cbor: "d87980" }),

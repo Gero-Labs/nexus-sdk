@@ -80,7 +80,7 @@ Implements the `Provider` interface from `@lucid-evolution/core-types`:
 | `getUtxosByOutRef(outRefs)` | `POST /api/transactions/utxos` | ≤100 per call — chunk larger inputs |
 | `getDelegation(rewardAddress)` | `GET /api/account/{stakeAddress}/info` | `{ poolId, rewards }` |
 | `getDatum(datumHash)` | `GET /api/scripts/datum/{datumHash}` | returns datum CBOR |
-| `awaitTx(txHash, checkInterval?)` | poll `GET /api/transactions/{txHash}` | default interval 3s, cap total wait |
+| `awaitTx(txHash, checkInterval?)` | poll `GET /api/transactions/{txHash}` | default interval 3s; polls until confirmed (no total-wait cap) |
 | `submitTx(tx)` | `POST /api/transactions/submit` | CBOR hex body; surface node error message |
 | `evaluateTx(tx, additionalUTxOs?)` | `POST /api/transactions/evaluate` | map to `EvalRedeemer[]` |
 
