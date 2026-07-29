@@ -8,6 +8,12 @@ covering Cardano (chain + market data), Bitcoin, and Midnight, plus an optional
 - Response and request types generated from the live Nexus OpenAPI spec.
 - `X-Api-Key` auth, automatic GET retries, per-request timeout.
 
+📚 **Full documentation:** [`docs/`](./docs/) — [getting started](./docs/getting-started.md),
+[errors](./docs/errors.md), [pagination](./docs/pagination.md), and the per-namespace API
+reference ([Cardano](./docs/reference/cardano.md) ·
+[market data](./docs/reference/market.md) · [Bitcoin](./docs/reference/bitcoin.md) ·
+[Midnight](./docs/reference/midnight.md)).
+
 ## Install
 
 ```bash
