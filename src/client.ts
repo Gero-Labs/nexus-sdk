@@ -1,4 +1,7 @@
 import { NexusApiError } from "./errors.js";
+import { type CardanoNamespace, makeCardano } from "./namespaces/cardano.js";
+import { type BitcoinNamespace, makeBitcoin } from "./namespaces/bitcoin.js";
+import { type MidnightNamespace, makeMidnight } from "./namespaces/midnight.js";
 
 export type NexusNetwork = "CARDANO_MAINNET" | "CARDANO_PREPROD" | "CARDANO_PREVIEW";
 
@@ -53,6 +56,11 @@ export class NexusClient {
     this.retryDelaysMs = options.retryDelaysMs ?? [250, 1000];
   }
 
+  /** The network passed at construction, if any. Used by mainnet-only guards (e.g. market data). */
+  get networkOption(): NexusNetwork | undefined {
+    return this.network;
+  }
+
   private buildUrl(path: string, query?: Record<string, string | number | undefined>): string {
     const url = new URL(this.baseUrl + path);
     for (const [key, value] of Object.entries(query ?? {})) {
@@ -89,6 +97,13 @@ export class NexusClient {
     return (await res.json()) as T;
   }
 
+  /** GET a path whose response is a bare text/plain body (e.g. raw tx hex). */
+  async getText(path: string, query?: Record<string, string | number | undefined>): Promise<string> {
+    const res = await this.request(this.buildUrl(path, query), { method: "GET" }, true);
+    const text = await res.text();
+    return text.trim().replace(/^"|"$/g, "");
+  }
+
   async post<T>(path: string, body: unknown): Promise<T> {
     const res = await this.request(
       this.buildUrl(path),
@@ -111,5 +126,31 @@ export class NexusClient {
     );
     const text = await res.text();
     return text.trim().replace(/^"|"$/g, "");
+  }
+
+  /** DELETE a path. Returns the parsed JSON body, or undefined for an empty (204) response. */
+  async del<T>(path: string, query?: Record<string, string | number | undefined>): Promise<T> {
+    const res = await this.request(this.buildUrl(path, query), { method: "DELETE" }, false);
+    const text = await res.text();
+    return (text ? JSON.parse(text) : undefined) as T;
+  }
+
+  private _cardano?: CardanoNamespace;
+  private _bitcoin?: BitcoinNamespace;
+  private _midnight?: MidnightNamespace;
+
+  /** Cardano chain + market-data endpoints. */
+  get cardano(): CardanoNamespace {
+    return (this._cardano ??= makeCardano(this));
+  }
+
+  /** Bitcoin endpoints. */
+  get bitcoin(): BitcoinNamespace {
+    return (this._bitcoin ??= makeBitcoin(this));
+  }
+
+  /** Midnight endpoints. */
+  get midnight(): MidnightNamespace {
+    return (this._midnight ??= makeMidnight(this));
   }
 }
