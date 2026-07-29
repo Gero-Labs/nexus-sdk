@@ -6,6 +6,7 @@ market data), Bitcoin, and Midnight — plus an optional lucid-evolution provide
 ## Guides
 
 - [Getting started](./getting-started.md) — install, construct a client, first calls.
+- [Migration](./migration.md) — moving from the Blockfrost SDK, Koios, or a lucid/Mesh provider.
 - [Errors](./errors.md) — `NexusApiError`, `NexusUsageError`, and 404 handling.
 - [Pagination](./pagination.md) — the `{ page, pageSize }` convention and per-endpoint params.
 
