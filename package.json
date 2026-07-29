@@ -1,7 +1,7 @@
 {
   "name": "@adlabs/nexus",
   "version": "0.2.0",
-  "description": "TypeScript SDK for the Nexus API (Cardano, Bitcoin, Midnight) — typed client + lucid-evolution provider",
+  "description": "TypeScript SDK for the Nexus API (Cardano, Bitcoin, Midnight) — typed, namespaced client",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -27,16 +27,6 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
-    },
-    "./lucid": {
-      "import": {
-        "types": "./dist/lucid/index.d.ts",
-        "default": "./dist/lucid/index.js"
-      },
-      "require": {
-        "types": "./dist/lucid/index.d.cts",
-        "default": "./dist/lucid/index.cjs"
-      }
     }
   },
   "files": [
@@ -51,9 +41,7 @@
     "typecheck": "tsc --noEmit",
     "gen:types": "openapi-typescript ${NEXUS_OPENAPI_URL:-https://nexus.gerowallet.io/v3/api-docs} -o src/generated/schema.d.ts"
   },
-  "dependencies": {
-    "@lucid-evolution/core-types": "^0.3.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^20.14.0",
     "eslint": "^9.0.0",

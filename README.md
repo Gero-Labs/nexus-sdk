@@ -1,10 +1,9 @@
 # @adlabs/nexus
 
 TypeScript SDK for the [Nexus](https://nexus.gerowallet.io) API — a typed, namespaced client
-covering Cardano (chain + market data), Bitcoin, and Midnight, plus an optional
-[lucid-evolution](https://github.com/Anastasia-Labs/lucid-evolution) provider.
+covering Cardano (chain + market data), Bitcoin, and Midnight.
 
-- Zero runtime dependencies in the core client.
+- Zero runtime dependencies.
 - Response and request types generated from the live Nexus OpenAPI spec.
 - `X-Api-Key` auth, automatic GET retries, per-request timeout.
 
@@ -97,42 +96,30 @@ Regenerate after an API change:
 npm run gen:types   # NEXUS_OPENAPI_URL overrides the source spec
 ```
 
-## Use with lucid-evolution
+## Use with lucid-evolution or Mesh
 
-> ⚠️ **Deprecated.** The `@adlabs/nexus/lucid` adapter is deprecated in favor of the
-> **native Nexus provider that ships with lucid-evolution**
-> ([Anastasia-Labs/lucid-evolution#722](https://github.com/Anastasia-Labs/lucid-evolution/pull/722)):
-> ```ts
-> import { Nexus } from "@lucid-evolution/lucid";
-> const provider = new Nexus({ apiKey: process.env.NEXUS_API_KEY! });
-> ```
-> The adapter below still works for backward compatibility and will be removed in a future
-> major version.
+This package is the **raw data client**. To use Nexus as a transaction provider in a
+lucid-evolution or Mesh app, use each framework's **native Nexus provider** — no adapter
+from this package is needed:
 
-```bash
-npm install @adlabs/nexus @lucid-evolution/lucid
+```ts
+// lucid-evolution (Anastasia-Labs/lucid-evolution#722)
+import { Nexus } from "@lucid-evolution/lucid";
+const provider = new Nexus({ apiKey: process.env.NEXUS_API_KEY! });
+
+// Mesh (MeshJS/providers)
+import { NexusProvider } from "@meshsdk/provider";
+const provider = new NexusProvider({ apiKey: process.env.NEXUS_API_KEY! });
 ```
 
-```typescript
-import { Lucid } from "@lucid-evolution/lucid";
-import { NexusProvider } from "@adlabs/nexus/lucid"; // deprecated — see note above
-
-const lucid = await Lucid(
-  new NexusProvider({ apiKey: process.env.NEXUS_API_KEY!, network: "Preprod" }),
-  "Preprod",
-);
-```
-
-> The `/lucid` adapter's type dependency (`@lucid-evolution/core-types`) transitively
-> installs the Cardano multiplatform WASM libraries (~9MB). The core client has zero
-> runtime dependencies.
+See the [migration guide](./docs/migration.md) for the drop-in provider swap.
 
 ## Client options
 
 | Option | Default | Notes |
 |---|---|---|
 | `apiKey` | — | Nexus API key (`X-Api-Key`) |
-| `network` | key's scoped network | `CARDANO_MAINNET` / `CARDANO_PREPROD` / `CARDANO_PREVIEW` (the `/lucid` provider takes `Mainnet` / `Preprod` / `Preview`) |
+| `network` | key's scoped network | `CARDANO_MAINNET` / `CARDANO_PREPROD` / `CARDANO_PREVIEW` |
 | `baseUrl` | `https://nexus.gerowallet.io` | self-hosted Nexus deployments |
 | `timeoutMs` | `30000` | per-attempt timeout |
 | `retryDelaysMs` | `[250, 1000]` | GET retry backoff on 5xx / network errors |

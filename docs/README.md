@@ -1,7 +1,7 @@
 # @adlabs/nexus documentation
 
 TypeScript client for the [Nexus](https://nexus.gerowallet.io) API — Cardano (chain +
-market data), Bitcoin, and Midnight — plus an optional lucid-evolution provider.
+market data), Bitcoin, and Midnight.
 
 ## Guides
 

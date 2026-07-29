@@ -6,8 +6,9 @@
 npm install @adlabs/nexus
 ```
 
-The core client has zero runtime dependencies. The optional `/lucid` provider needs
-`@lucid-evolution/lucid` (see [the lucid section of the README](../README.md#use-with-lucid-evolution)).
+The client has zero runtime dependencies. To use Nexus as a transaction provider in a
+lucid-evolution or Mesh app, use the framework's native Nexus provider instead — see the
+[migration guide](./migration.md#1-drop-in-provider-swap).
 
 ## Construct a client
 
