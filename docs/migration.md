@@ -45,9 +45,8 @@ const provider = new NexusProvider({ apiKey: process.env.NEXUS_API_KEY! });
 The provider implements the same `IFetcher` / `IEvaluator` / `ISubmitter` (Mesh) or
 `Provider` (lucid) interface your code already calls — no other changes.
 
-This SDK also ships its own lucid adapter at `@adlabs/nexus/lucid` (see the
-[README](../README.md#use-with-lucid-evolution)); prefer the framework-native provider when
-it is available.
+This SDK's own lucid adapter at `@adlabs/nexus/lucid` is **deprecated** in favor of the
+framework-native provider above and will be removed in a future major version.
 
 ---
 

@@ -99,13 +99,23 @@ npm run gen:types   # NEXUS_OPENAPI_URL overrides the source spec
 
 ## Use with lucid-evolution
 
+> ⚠️ **Deprecated.** The `@adlabs/nexus/lucid` adapter is deprecated in favor of the
+> **native Nexus provider that ships with lucid-evolution**
+> ([Anastasia-Labs/lucid-evolution#722](https://github.com/Anastasia-Labs/lucid-evolution/pull/722)):
+> ```ts
+> import { Nexus } from "@lucid-evolution/lucid";
+> const provider = new Nexus({ apiKey: process.env.NEXUS_API_KEY! });
+> ```
+> The adapter below still works for backward compatibility and will be removed in a future
+> major version.
+
 ```bash
 npm install @adlabs/nexus @lucid-evolution/lucid
 ```
 
 ```typescript
 import { Lucid } from "@lucid-evolution/lucid";
-import { NexusProvider } from "@adlabs/nexus/lucid";
+import { NexusProvider } from "@adlabs/nexus/lucid"; // deprecated — see note above
 
 const lucid = await Lucid(
   new NexusProvider({ apiKey: process.env.NEXUS_API_KEY!, network: "Preprod" }),

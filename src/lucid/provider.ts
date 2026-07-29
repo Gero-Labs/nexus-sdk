@@ -58,10 +58,26 @@ const NETWORK_MAP: Record<LucidNetwork, NexusNetwork> = {
 
 const PAGE_SIZE = 100;
 
+let deprecationWarned = false;
+
+/**
+ * lucid-evolution {@link Provider} backed by the Nexus API.
+ *
+ * @deprecated Use the **native Nexus provider that ships with lucid-evolution** instead
+ * (`new Nexus({ apiKey })`, Anastasia-Labs/lucid-evolution#722). This adapter is kept for
+ * backward compatibility and will be removed in a future major version.
+ */
 export class NexusProvider implements Provider {
   readonly client: NexusClient;
 
   constructor(options: NexusProviderOptions) {
+    if (!deprecationWarned) {
+      deprecationWarned = true;
+      console.warn(
+        "[@adlabs/nexus] NexusProvider from @adlabs/nexus/lucid is deprecated. Use the " +
+          "native Nexus provider in lucid-evolution instead (new Nexus({ apiKey })).",
+      );
+    }
     this.client = new NexusClient({
       apiKey: options.apiKey,
       baseUrl: options.baseUrl,
