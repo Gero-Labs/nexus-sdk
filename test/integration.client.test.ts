@@ -1,4 +1,4 @@
-import { describe, expect, it, type TestContext } from "vitest";
+import { beforeAll, describe, expect, it, type TestContext } from "vitest";
 import { NexusClient, type NexusNetwork } from "../src/client.js";
 import { NexusApiError } from "../src/errors.js";
 
@@ -48,6 +48,22 @@ async function entitled<T>(ctx: TestContext, call: () => Promise<T>): Promise<T>
   }
 }
 
+/**
+ * Fetches a seed value from a live list/detail call for use by dependent tests. Any error
+ * (including a 402/403 the key can't reach) yields `undefined`, so seeding never fails the
+ * suite — dependent tests self-skip when their seed is missing.
+ */
+async function seed<T, R>(
+  call: () => Promise<T>,
+  pick: (result: T) => R | undefined,
+): Promise<R | undefined> {
+  try {
+    return pick(await call());
+  } catch {
+    return undefined;
+  }
+}
+
 describe.skipIf(!apiKey)("client integration (read-only)", () => {
   const client = makeClient(network);
 
@@ -89,6 +105,117 @@ describe.skipIf(!apiKey)("client integration (read-only)", () => {
     it.skipIf(!stakeAddress)("accounts.info returns account info", async (ctx) => {
       expect(
         await entitled(ctx, () => client.cardano.accounts.info(stakeAddress!)),
+      ).toBeTruthy();
+    });
+  });
+
+  // Dependent reads seeded from live lists — a real pool/drep/block/proposal/tx id is
+  // pulled from an index endpoint and fed into its detail endpoints. A test self-skips when
+  // its seed is unavailable (empty list, or the key isn't entitled to the seeding call).
+  describe("cardano deep (self-seeded from live data)", () => {
+    let poolId: string | undefined;
+    let drepId: string | undefined;
+    let blockHash: string | undefined;
+    let latestEpoch: number | undefined;
+    let govActionId: string | undefined;
+    let txHash: string | undefined;
+
+    beforeAll(async () => {
+      poolId = await seed(
+        () => client.cardano.pools.list(),
+        (r) => (r as Array<{ poolIdBech32?: string }>)?.[0]?.poolIdBech32,
+      );
+      drepId = await seed(
+        () => client.cardano.dreps.list(),
+        (r) => (r as Array<{ drepId?: string }>)?.[0]?.drepId,
+      );
+      const block = await seed(
+        () => client.cardano.blocks.latest(),
+        (b) => b as { hash?: string; epoch?: number },
+      );
+      blockHash = block?.hash;
+      latestEpoch = block?.epoch;
+      const proposals = await seed(
+        () => client.cardano.governance.proposals(),
+        (p) => p as { items?: Array<{ govActionId?: string; txHash?: string }> },
+      );
+      govActionId = proposals?.items?.[0]?.govActionId;
+      txHash = proposals?.items?.[0]?.txHash;
+    });
+
+    it("pools.byId + pools.history for a live pool", async (ctx) => {
+      if (!poolId) ctx.skip();
+      expect(await entitled(ctx, () => client.cardano.pools.byId(poolId!))).toBeTruthy();
+      expect(
+        await entitled(ctx, () => client.cardano.pools.history(poolId!)),
+      ).toBeTruthy();
+    });
+
+    it("pools.registrations + pools.retirements", async (ctx) => {
+      expect(
+        await entitled(ctx, () => client.cardano.pools.registrations()),
+      ).toBeTruthy();
+      expect(
+        await entitled(ctx, () => client.cardano.pools.retirements()),
+      ).toBeTruthy();
+    });
+
+    it("dreps.byId + dreps.delegators for a live drep", async (ctx) => {
+      if (!drepId) ctx.skip();
+      expect(await entitled(ctx, () => client.cardano.dreps.byId(drepId!))).toBeTruthy();
+      expect(
+        Array.isArray(await entitled(ctx, () => client.cardano.dreps.delegators(drepId!))),
+      ).toBe(true);
+    });
+
+    it("blocks.byHash + blocks.list", async (ctx) => {
+      if (!blockHash) ctx.skip();
+      expect(
+        await entitled(ctx, () => client.cardano.blocks.byHash(blockHash!)),
+      ).toBeTruthy();
+      expect(await entitled(ctx, () => client.cardano.blocks.list())).toBeTruthy();
+    });
+
+    it("epochs.params for the current epoch", async (ctx) => {
+      if (latestEpoch === undefined) ctx.skip();
+      expect(
+        await entitled(ctx, () => client.cardano.epochs.params({ epoch_no: latestEpoch! })),
+      ).toBeTruthy();
+    });
+
+    it("governance committee + constitution + dreps", async (ctx) => {
+      expect(
+        await entitled(ctx, () => client.cardano.governance.committee()),
+      ).toBeTruthy();
+      expect(
+        await entitled(ctx, () => client.cardano.governance.constitution()),
+      ).toBeTruthy();
+      expect(await entitled(ctx, () => client.cardano.governance.dreps())).toBeTruthy();
+    });
+
+    it("governance proposal detail + votes + voting-summary", async (ctx) => {
+      if (!govActionId) ctx.skip();
+      expect(
+        await entitled(ctx, () => client.cardano.governance.proposal(govActionId!)),
+      ).toBeTruthy();
+      expect(
+        await entitled(ctx, () => client.cardano.governance.proposalVotes(govActionId!)),
+      ).toBeTruthy();
+      expect(
+        await entitled(ctx, () => client.cardano.governance.votingSummary(govActionId!)),
+      ).toBeTruthy();
+    });
+
+    it("transactions.byHash + utxos for a live tx", async (ctx) => {
+      // Note: transactions.cbor is intentionally not exercised here — the raw-tx-CBOR
+      // endpoint depends on a backend feature that isn't populated on every deployment
+      // (it 404s for otherwise-valid txs). The `cbor` method is covered by the unit tests.
+      if (!txHash) ctx.skip();
+      expect(
+        await entitled(ctx, () => client.cardano.transactions.byHash(txHash!)),
+      ).toBeTruthy();
+      expect(
+        await entitled(ctx, () => client.cardano.transactions.utxos(txHash!)),
       ).toBeTruthy();
     });
   });
